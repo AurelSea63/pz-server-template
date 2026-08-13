@@ -98,11 +98,19 @@ Compte `admin` (mot de passe = `PZ_ADMIN_PASSWORD`), panneau admin in-game, kick
 
 ## 🔔 Discord (optionnel)
 
-Renseignez les webhooks dans `.env` (`DISCORD_WEBHOOK_URL`, `DISCORD_ANNOUNCE_WEBHOOK`, `DISCORD_EVENT_WEBHOOK`).
-Laissé vide = désactivé.
+Renseignez les webhooks dans `.env`. Chaque type d'event peut aller dans un **salon dédié**
+(laissez vide pour désactiver ; un webhook vide retombe sur un salon de repli) :
 
-**Notifications temps réel** — le watcher lit les logs en continu et notifie automatiquement
-(connexions, déconnexions, morts, démarrage/arrêt) :
+| Event | Webhook `.env` | Contenu |
+|---|---|---|
+| 🟢 Démarrage / 🔴 Arrêt | `DISCORD_ANNOUNCE_WEBHOOK` | — |
+| 👤 Connexion / déconnexion | `DISCORD_CONNECT_WEBHOOK` | avec le pseudo |
+| 💀 Mort | `DISCORD_DEATH_WEBHOOK` (→ repli sur EVENT) | *« a survécu 2 jours et 3 heures »* |
+| 🧟 Raid / horde | `DISCORD_EVENT_WEBHOOK` | — |
+| 🔧 Admin / 💾 Backup | `DISCORD_WEBHOOK_URL` (général) | — |
+
+**Notifications temps réel** — le watcher lit les logs en continu et notifie automatiquement.
+Les morts (avec temps de survie) sont lues dans `Zomboid/Logs/*_PerkLog.txt`, le reste sur la sortie du conteneur :
 ```bash
 # Test manuel
 sudo ./scripts/discord-watcher.sh
