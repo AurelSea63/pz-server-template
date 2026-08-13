@@ -39,7 +39,7 @@ case "${1}" in
     stop)       [ "${LOG_SERVER_STOP:-1}" = "1" ]       && log_discord "🔴 Serveur arrêté"    "Le serveur s'est arrêté."      "16711680" "${DISCORD_ANNOUNCE_WEBHOOK}" ;;
     connect)    [ "${LOG_PLAYER_CONNECT:-1}" = "1" ]    && log_discord "👤 Connexion"          "**$2** a rejoint le serveur"   "65280"    "${DISCORD_CONNECT_WEBHOOK}" ;;
     disconnect) [ "${LOG_PLAYER_DISCONNECT:-1}" = "1" ] && log_discord "👤 Déconnexion"        "**$2** a quitté le serveur"    "16776960" "${DISCORD_CONNECT_WEBHOOK}" ;;
-    death)      [ "${LOG_PLAYER_DEATH:-1}" = "1" ]      && log_discord "💀 Mort"               "**$2** est mort $3"            "16711680" "${DISCORD_EVENT_WEBHOOK}" ;;
+    death)      [ "${LOG_PLAYER_DEATH:-1}" = "1" ]      && log_discord "💀 Mort"               "**$2** est mort $3"            "16711680" "${DISCORD_DEATH_WEBHOOK:-$DISCORD_EVENT_WEBHOOK}" ;;
     raid)       [ "${LOG_RAIDS:-1}" = "1" ]             && log_discord "🧟 Raid"               "$2"                            "16711680" "${DISCORD_EVENT_WEBHOOK}" ;;
     admin)      [ "${LOG_ADMIN_ACTIONS:-1}" = "1" ]     && log_discord "🔧 Action admin"       "**$2** : $3"                   "16776960" ;;
     backup)     [ "${LOG_BACKUPS:-1}" = "1" ]           && log_discord "💾 Backup"             "Backup : $2"                   "3447003" ;;
