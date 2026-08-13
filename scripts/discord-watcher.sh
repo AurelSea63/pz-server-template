@@ -3,18 +3,19 @@
 # Se relance tout seul si le conteneur redémarre. Idéal via systemd (voir README).
 #
 # Usage : sudo ./scripts/discord-watcher.sh
-# Nécessite : docker + curl sur l'hôte, et les webhooks renseignés dans .env.
+# Nécessite : docker + curl sur l'hôte, et les webhooks renseignés (.env ou conf).
+#
+# NB : PZ ne logge PAS les morts sur stdout -> non gérées ici (voir Logs/ du serveur).
 
 set -u
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 LOGGER="${PROJECT_DIR}/scripts/discord-logger.sh"
 CONTAINER="${PZ_CONTAINER:-pz-server}"
 
-# Patterns de détection — ajustez si votre version de PZ log différemment.
-# (Inspectez avec : docker logs pz-server | grep -iE 'connect|disconnect|died')
-RE_CONNECT="${RE_CONNECT:-fully connected|Connected new client}"
-RE_DISCONNECT="${RE_DISCONNECT:-Disconnected player|disconnected}"
-RE_DEATH="${RE_DEATH:-ISDeadBody|PlayerDeath| is dead}"
+# Patterns de détection (ajustables via variables d'env si votre version diffère).
+# Connexion : la ligne 'coop player=X/Y username="Nom"' porte le pseudo.
+RE_CONNECT="${RE_CONNECT:-coop player=.*username=\"}"
+RE_DISCONNECT="${RE_DISCONNECT:-Disconnected player|disconnected player}"
 RE_READY="${RE_READY:-SERVER STARTED|server is listening}"
 
 extract_user() {
@@ -32,7 +33,6 @@ while true; do
     docker logs -f --since=1s "${CONTAINER}" 2>&1 | while IFS= read -r line; do
         if   echo "$line" | grep -qiE "${RE_CONNECT}";    then notify connect    "$(extract_user "$line")"
         elif echo "$line" | grep -qiE "${RE_DISCONNECT}"; then notify disconnect "$(extract_user "$line")"
-        elif echo "$line" | grep -qiE "${RE_DEATH}";      then notify death      "$(extract_user "$line")"
         elif echo "$line" | grep -qiE "${RE_READY}";      then notify start
         fi
     done
