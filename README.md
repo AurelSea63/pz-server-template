@@ -1,9 +1,28 @@
-# 🧟 Project Zomboid — Serveur dédié Docker (Build 42)
+<h1 align="center">🧟 Project Zomboid — Serveur dédié Docker (Build 42)</h1>
 
-Template **clé en main** pour déployer un serveur **Project Zomboid Build 42** avec Docker Compose :
-téléchargement auto du serveur, mods Steam Workshop, secrets hors git, sauvegardes, intégration Discord.
+<p align="center">
+  Template <b>clé en main</b> pour déployer un serveur <b>Project Zomboid Build 42</b> avec Docker Compose :<br>
+  téléchargement auto du serveur, mods Steam Workshop, secrets hors git, sauvegardes, notifications Discord live.
+</p>
+
+<p align="center">
+  <img alt="License" src="https://img.shields.io/github/license/AurelSea63/pz-server-template?color=green">
+  <img alt="Project Zomboid" src="https://img.shields.io/badge/Project%20Zomboid-Build%2042-red">
+  <img alt="Docker" src="https://img.shields.io/badge/Docker-Compose%20v2-2496ED?logo=docker&logoColor=white">
+  <img alt="Bash" src="https://img.shields.io/badge/scripts-Bash-4EAA25?logo=gnubash&logoColor=white">
+  <img alt="Stars" src="https://img.shields.io/github/stars/AurelSea63/pz-server-template?style=social">
+</p>
 
 > Pensé pour un workflow propre : on édite tout dans le repo, le serveur ne fait que `git pull` + relance.
+
+### 🔔 Aperçu des notifications Discord
+
+Le watcher poste en direct dans tes salons (chacun configurable) :
+
+> **🟢 Serveur démarré** — *#annonces*
+> **👤 Player1 a rejoint le serveur** — *#connexions*
+> **👤 Player2 a quitté le serveur** — *#connexions*
+> **💀 Player1 est mort après avoir survécu 2 jours et 3 heures** — *#morts*
 
 ## ✨ Fonctionnalités
 
