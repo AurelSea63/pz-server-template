@@ -1,8 +1,8 @@
-<h1 align="center">🧟 Project Zomboid — Serveur dédié Docker (Build 42)</h1>
+<h1 align="center">🧟 Project Zomboid — Dockerized Dedicated Server (Build 42)</h1>
 
 <p align="center">
-  Template <b>clé en main</b> pour déployer un serveur <b>Project Zomboid Build 42</b> avec Docker Compose :<br>
-  téléchargement auto du serveur, mods Steam Workshop, secrets hors git, sauvegardes, notifications Discord live.
+  A <b>turnkey</b> template to deploy a <b>Project Zomboid Build 42</b> server with Docker Compose:<br>
+  auto server download, Steam Workshop mods, secrets kept out of git, backups, live Discord notifications.
 </p>
 
 <p align="center">
@@ -13,155 +13,155 @@
   <img alt="Stars" src="https://img.shields.io/github/stars/AurelSea63/pz-server-template?style=social">
 </p>
 
-> Pensé pour un workflow propre : on édite tout dans le repo, le serveur ne fait que `git pull` + relance.
+> Built for a clean workflow: edit everything in the repo, the server only does `git pull` + reload.
 
-### 🔔 Aperçu des notifications Discord
+### 🔔 Discord notifications preview
 
-Le watcher poste en direct dans tes salons (chacun configurable) :
+The watcher posts live to your channels (each one configurable):
 
-> **🟢 Serveur démarré** — *#annonces*
-> **👤 Player1 a rejoint le serveur** — *#connexions*
-> **👤 Player2 a quitté le serveur** — *#connexions*
-> **💀 Player1 est mort après avoir survécu 2 jours et 3 heures** — *#morts*
+> **🟢 Server started** — *#announcements*
+> **👤 Player1 joined the server** — *#connections*
+> **👤 Player2 left the server** — *#connections*
+> **💀 Player1 died after surviving 2 days and 3 hours** — *#deaths*
 
-## ✨ Fonctionnalités
+## ✨ Features
 
-- 🐳 **Docker** : image auto-construite (Ubuntu + serveur PZ via SteamCMD, JRE embarqué)
-- 🔧 **Mods Workshop** : listés dans la config, téléchargés automatiquement au démarrage
-- 🔐 **Secrets dans `.env`** (jamais commités) : mots de passe admin / serveur / RCON
-- 🧟 **Sandbox versionné** : réglages de jeu dans le repo, appliqués au démarrage
-- 💾 **Sauvegardes** : script backup/restore + rotation (cron-friendly)
-- 🔔 **Discord** (optionnel) : notifications via webhooks
-- 🛡️ **Sécurité** : conteneur non-root (drop de privilèges via `gosu`)
+- 🐳 **Docker**: self-built image (Ubuntu + PZ server via SteamCMD, bundled JRE)
+- 🔧 **Workshop mods**: listed in the config, auto-downloaded on startup
+- 🔐 **Secrets in `.env`** (never committed): admin / server / RCON passwords
+- 🧟 **Versioned sandbox**: game settings live in the repo, applied on startup
+- 💾 **Backups**: backup/restore script + rotation (cron-friendly)
+- 🔔 **Discord** (optional): live notifications via webhooks (with survival time on death)
+- 🛡️ **Security**: non-root container (privilege drop via `gosu`)
 
-## 📋 Prérequis
+## 📋 Requirements
 
-- Docker ≥ 20.10 et Docker Compose v2 (`docker compose`)
-- ~6 Go de RAM libre, ~10 Go de disque
-- Un VPS/serveur Linux (ou Docker Desktop)
+- Docker ≥ 20.10 and Docker Compose v2 (`docker compose`)
+- ~6 GB free RAM, ~10 GB disk
+- A Linux VPS/server (or Docker Desktop)
 
-## 🚀 Démarrage rapide
+## 🚀 Quick start
 
 ```bash
-git clone https://github.com/<vous>/<repo>.git
+git clone https://github.com/<you>/<repo>.git
 cd <repo>
 
 # 1) Secrets
 cp .env.example .env
-nano .env                 # définir au moins PZ_ADMIN_PASSWORD
+nano .env                 # set at least PZ_ADMIN_PASSWORD
 
-# 2) Construire (télécharge le serveur PZ, ~5-10 min la 1re fois)
+# 2) Build (downloads the PZ server, ~5-10 min the first time)
 docker compose build
 
-# 3) Lancer
+# 3) Run
 docker compose up -d
 docker compose logs -f pz-server
 ```
 
-Connexion depuis le jeu : **Join → Add Server →** `VOTRE_IP:16210`.
+Connect from the game: **Join → Add Server →** `YOUR_IP:16210`.
 
 ## ⚙️ Configuration
 
-| Fichier | Rôle |
+| File | Purpose |
 |---|---|
-| [`.env`](.env.example) | **Secrets** (mots de passe, webhooks Discord) — hors git |
-| [`config/ServerTestServer.ini`](config/ServerTestServer.ini) | Réglages serveur (nom, ports, PVP, **mods**) |
-| [`config/servertest_SandboxVars.lua`](config/servertest_SandboxVars.lua) | Réglages Sandbox (zombies, XP, loot…) |
-| [`docker-compose.yml`](docker-compose.yml) | Ressources, ports, volumes |
+| [`.env`](.env.example) | **Secrets** (passwords, Discord webhooks) — out of git |
+| [`config/ServerTestServer.ini`](config/ServerTestServer.ini) | Server settings (name, ports, PVP, **mods**) |
+| [`config/servertest_SandboxVars.lua`](config/servertest_SandboxVars.lua) | Sandbox settings (zombies, XP, loot…) |
+| [`docker-compose.yml`](docker-compose.yml) | Resources, ports, volumes |
 
-> ⚠️ **Le port de jeu se règle avec `DefaultPort`** dans l'ini (la clé `Port=` est ignorée par PZ).
+> ⚠️ **The game port is set with `DefaultPort`** in the ini (PZ ignores the `Port=` key).
 
-Après modification de la config : `docker compose restart pz-server`.
-Après modification du `.env` ou des ports : **`docker compose up -d`** (recrée le conteneur).
+After a config change: `docker compose restart pz-server`.
+After an `.env` or ports change: **`docker compose up -d`** (recreates the container).
 
-### Ajouter des mods
+### Adding mods
 
-Dans `config/ServerTestServer.ini`, renseignez les **deux** listes (mêmes mods, même ordre) :
+In `config/ServerTestServer.ini`, fill **both** lists (same mods, same order):
 ```ini
-WorkshopItems=2392709985;2857548524   # IDs Workshop (numéro dans l'URL)
-Mods=tsarslib;ExampleMod              # IDs internes (page Workshop -> "Mod ID")
+WorkshopItems=2392709985;2857548524   # Workshop IDs (number in the URL)
+Mods=tsarslib;ExampleMod              # internal IDs (Workshop page -> "Mod ID")
 ```
-Le serveur télécharge les mods au prochain démarrage. Ordre conseillé : bibliothèques → véhicules → QoL.
+The server downloads the mods on the next startup. Recommended order: libraries → vehicles → QoL.
 
-## 🔌 Ports & pare-feu
+## 🔌 Ports & firewall
 
-| Port | Proto | Rôle |
+| Port | Proto | Role |
 |---|---|---|
-| 16210 | UDP (+TCP) | Jeu |
-| 16211 | TCP/UDP | RCON / admin (**restreindre à votre IP**) |
-| 8766-8767 | UDP | Liste Steam Internet |
-| 16262 | UDP | Port direct (perfs) |
+| 16210 | UDP (+TCP) | Game |
+| 16211 | TCP/UDP | RCON / admin (**restrict to your IP**) |
+| 8766-8767 | UDP | Steam Internet server list |
+| 16262 | UDP | Direct connection port (perf) |
 
-Ouvrez ces ports dans le pare-feu de votre hébergeur **et** local (ex. `ufw allow 16210/udp`).
+Open these ports in your host's firewall **and** locally (e.g. `ufw allow 16210/udp`).
 
-### Serveur public (liste Steam)
-Dans l'ini : `Public=true` + `PublicName=...`, ouvrez **8766-8767/udp**, attendez ~2-5 min.
+### Public server (Steam list)
+In the ini: `Public=true` + `PublicName=...`, open **8766-8767/udp**, wait ~2-5 min.
 
-## 💾 Sauvegardes
+## 💾 Backups
 
 ```bash
-sudo ./scripts/backup-world.sh backup        # manuel (coupe le serveur ~qq s)
-sudo ./scripts/backup-world.sh auto-backup   # à chaud (pour cron)
+sudo ./scripts/backup-world.sh backup        # manual (stops the server briefly)
+sudo ./scripts/backup-world.sh auto-backup   # hot (for cron)
 sudo ./scripts/backup-world.sh list
-sudo ./scripts/backup-world.sh restore <nom>
+sudo ./scripts/backup-world.sh restore <name>
 ```
-Cron toutes les 3 h (garde les 10 derniers) :
+Cron every 3h (keeps the last 10):
 ```
-0 */3 * * * /chemin/vers/repo/scripts/backup-world.sh auto-backup >> /chemin/vers/repo/backups/backup.log 2>&1
+0 */3 * * * /path/to/repo/scripts/backup-world.sh auto-backup >> /path/to/repo/backups/backup.log 2>&1
 ```
 
 ## 🛡️ Administration
 
-Compte `admin` (mot de passe = `PZ_ADMIN_PASSWORD`), panneau admin in-game, kick/ban, RCON…
-→ voir **[ADMIN-COMMANDS.md](ADMIN-COMMANDS.md)** (inclut le dépannage « mot de passe erroné »).
+`admin` account (password = `PZ_ADMIN_PASSWORD`), in-game admin panel, kick/ban, RCON…
+→ see **[ADMIN-COMMANDS.md](ADMIN-COMMANDS.md)** (includes "wrong password" troubleshooting).
 
-## 🔔 Discord (optionnel)
+## 🔔 Discord (optional)
 
-Renseignez les webhooks dans `.env`. Chaque type d'event peut aller dans un **salon dédié**
-(laissez vide pour désactiver ; un webhook vide retombe sur un salon de repli) :
+Set the webhooks in `.env`. Each event type can go to its own **dedicated channel**
+(leave empty to disable; an empty webhook falls back to a default channel):
 
-| Event | Webhook `.env` | Contenu |
+| Event | `.env` webhook | Content |
 |---|---|---|
-| 🟢 Démarrage / 🔴 Arrêt | `DISCORD_ANNOUNCE_WEBHOOK` | — |
-| 👤 Connexion / déconnexion | `DISCORD_CONNECT_WEBHOOK` | avec le pseudo |
-| 💀 Mort | `DISCORD_DEATH_WEBHOOK` (→ repli sur EVENT) | *« a survécu 2 jours et 3 heures »* |
+| 🟢 Start / 🔴 Stop | `DISCORD_ANNOUNCE_WEBHOOK` | — |
+| 👤 Connect / disconnect | `DISCORD_CONNECT_WEBHOOK` | with the username |
+| 💀 Death | `DISCORD_DEATH_WEBHOOK` (→ falls back to EVENT) | *"died after surviving 2 days and 3 hours"* |
 | 🧟 Raid / horde | `DISCORD_EVENT_WEBHOOK` | — |
-| 🔧 Admin / 💾 Backup | `DISCORD_WEBHOOK_URL` (général) | — |
+| 🔧 Admin / 💾 Backup | `DISCORD_WEBHOOK_URL` (general) | — |
 
-**Notifications temps réel** — le watcher lit les logs en continu et notifie automatiquement.
-Les morts (avec temps de survie) sont lues dans `Zomboid/Logs/*_PerkLog.txt`, le reste sur la sortie du conteneur :
+**Real-time notifications** — the watcher continuously reads the logs and notifies automatically.
+Deaths (with survival time) are read from `Zomboid/Logs/*_PerkLog.txt`, the rest from the container output:
 ```bash
-# Test manuel
+# Manual test
 sudo ./scripts/discord-watcher.sh
 
-# En service (recommandé) — voir systemd/pz-discord-watcher.service
+# As a service (recommended) — see systemd/pz-discord-watcher.service
 sudo cp systemd/pz-discord-watcher.service /etc/systemd/system/
 sudo sed -i "s#/path/to/repo#$(pwd)#g" /etc/systemd/system/pz-discord-watcher.service
 sudo systemctl daemon-reload && sudo systemctl enable --now pz-discord-watcher
 journalctl -u pz-discord-watcher -f
 ```
-> Les patterns de détection sont en haut de `discord-watcher.sh` — ajustez-les si un event ne se
-> déclenche pas (`docker logs pz-server` pour voir le format exact de votre version).
+> Detection patterns are at the top of `discord-watcher.sh` — tweak them if an event doesn't
+> fire (`docker logs pz-server` to see your version's exact format).
 
-## 🔁 Workflow recommandé
+## 🔁 Recommended workflow
 
-Éditez la config **dans le repo** (commit/push), puis sur le serveur :
+Edit config **in the repo** (commit/push), then on the server:
 ```bash
-git pull && docker compose restart pz-server   # ou 'up -d' si ports/env/volumes changent
+git pull && docker compose restart pz-server   # or 'up -d' if ports/env/volumes change
 ```
-Les secrets restent dans le `.env` du serveur (hors git) → pas de conflit au `pull`.
+Secrets stay in the server's `.env` (out of git) → no conflict on `pull`.
 
-## 🐛 Dépannage express
+## 🐛 Quick troubleshooting
 
-- **Le build ne télécharge pas le jeu** → relancez `docker compose build` (SteamCMD retry inclus).
-- **Personne ne peut se connecter** → vérifiez `DefaultPort` = port mappé, et le pare-feu (UDP !).
-- **« mot de passe erroné »** → voir [ADMIN-COMMANDS.md](ADMIN-COMMANDS.md) (souvent le cache des favoris du client).
-- **Mods qui bloquent le démarrage** → un mod incompatible B42 ; retirez-le de `Mods=`/`WorkshopItems=`.
+- **Build doesn't download the game** → re-run `docker compose build` (SteamCMD retry included).
+- **Nobody can connect** → check `DefaultPort` = mapped port, and the firewall (UDP!).
+- **"wrong password"** → see [ADMIN-COMMANDS.md](ADMIN-COMMANDS.md) (often the client's favorites cache).
+- **Mods block startup** → a mod incompatible with B42; remove it from `Mods=`/`WorkshopItems=`.
 
-## 📄 Licence
+## 📄 License
 
-MIT — faites-en ce que vous voulez. Contributions bienvenues.
+MIT — do whatever you want. Contributions welcome.
 
 ---
 
-*Project Zomboid est une marque de The Indie Stone. Ce projet n'est pas affilié.*
+*Project Zomboid is a trademark of The Indie Stone. This project is not affiliated.*

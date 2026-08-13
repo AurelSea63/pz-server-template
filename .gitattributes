@@ -1,11 +1,11 @@
-# Normalisation des fins de ligne : LF partout (dépôt Linux/Docker)
+# Line-ending normalization: LF everywhere (Linux/Docker repo)
 * text=auto eol=lf
 
-# Les scripts shell DOIVENT être en LF (sinon "bad interpreter" dans le conteneur)
+# Shell scripts MUST be LF (otherwise "bad interpreter" in the container)
 *.sh text eol=lf
 *.lua text eol=lf
 
-# Fichiers binaires
+# Binary files
 *.png binary
 *.jpg binary
 *.tar.gz binary

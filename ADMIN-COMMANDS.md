@@ -1,99 +1,99 @@
-# 🛡️ Commandes d'administration
+# 🛡️ Admin commands
 
-Référence pour administrer les joueurs et le serveur.
+Reference for administering players and the server.
 
 ---
 
-## Devenir admin
+## Becoming admin
 
-1. En jeu, connecte-toi avec le compte **`admin`** (mot de passe = `PZ_ADMIN_PASSWORD` du `.env`).
-2. Pour promouvoir ton perso : connecté en `admin`, tape dans le chat :
+1. In game, log in with the **`admin`** account (password = `PZ_ADMIN_PASSWORD` from `.env`).
+2. To promote your own character: while logged in as `admin`, type in chat:
    ```
-   /setaccesslevel "TonPseudo" admin
+   /setaccesslevel "YourName" admin
    ```
-**Niveaux** : `admin` > `moderator` > `overseer` > `gm` > `observer` > `none`.
+**Levels**: `admin` > `moderator` > `overseer` > `gm` > `observer` > `none`.
 
 ---
 
-## 🖱️ Le plus simple : le panneau Admin (in-game)
+## 🖱️ Easiest: the in-game Admin panel
 
-Connecté en admin, un **bouton roue crantée** apparaît → interface pour gérer joueurs, spawn d'items,
-options Sandbox à chaud, etc. Plus rapide que les commandes pour le ponctuel.
+Logged in as admin, a **gear button** appears → panel to manage players, spawn items,
+tweak Sandbox options live, etc. Faster than commands for one-off actions.
 
 ---
 
-## 💬 Commandes chat (préfixe `/`)
+## 💬 Chat commands (prefix `/`)
 
-### Joueurs
-| Commande | Effet |
+### Players
+| Command | Effect |
 |---|---|
-| `/players` | Liste les joueurs connectés |
-| `/kickuser "pseudo" -r "raison"` | Expulse |
-| `/banuser "pseudo" -r "raison"` | Bannit (`-ip` pour l'IP) |
-| `/unbanuser "pseudo"` | Débannit |
-| `/setaccesslevel "pseudo" moderator` | Change le niveau d'accès |
-| `/servermsg "message"` | Message diffusé |
-| `/additem "pseudo" "Base.Axe" 1` | Donne un objet |
-| `/teleport "pseudo1" "pseudo2"` | Téléportation |
+| `/players` | List connected players |
+| `/kickuser "name" -r "reason"` | Kick |
+| `/banuser "name" -r "reason"` | Ban (`-ip` to ban the IP) |
+| `/unbanuser "name"` | Unban |
+| `/setaccesslevel "name" moderator` | Change access level |
+| `/servermsg "message"` | Broadcast a message |
+| `/additem "name" "Base.Axe" 1` | Give an item |
+| `/teleport "name1" "name2"` | Teleport |
 
-### Serveur & events
-| Commande | Effet |
+### Server & events
+| Command | Effect |
 |---|---|
-| `/save` | Sauvegarde immédiate |
-| `/quit` | Sauvegarde **et arrête** |
-| `/changeoption <option> <valeur>` | Change une option à chaud |
-| `/alarm` `/gunshot` `/chopper` | Bruits qui attirent les zombies |
-| `/startrain` `/startstorm` `/thunder` | Météo |
+| `/save` | Save the world now |
+| `/quit` | Save **and stop** |
+| `/changeoption <option> <value>` | Change an option live |
+| `/alarm` `/gunshot` `/chopper` | Noises that attract zombies |
+| `/startrain` `/startstorm` `/thunder` | Weather |
 
-> Les pseudos avec espace **entre guillemets** : `/kickuser "Jean Bon"`.
+> Names with spaces **in quotes**: `/kickuser "John Doe"`.
 
 ---
 
-## 🔌 Console RCON (à distance, hors jeu)
+## 🔌 RCON console (remote, out of game)
 
-Nécessite un client RCON (ex. `mcrcon`) :
+Requires an RCON client (e.g. `mcrcon`):
 ```bash
-mcrcon -H VOTRE_IP -P 16211 -p "<PZ_RCON_PASSWORD>" "players"
-mcrcon -H VOTRE_IP -P 16211 -p "<PZ_RCON_PASSWORD>" 'servermsg "Redemarrage dans 5 min"'
+mcrcon -H YOUR_IP -P 16211 -p "<PZ_RCON_PASSWORD>" "players"
+mcrcon -H YOUR_IP -P 16211 -p "<PZ_RCON_PASSWORD>" 'servermsg "Restart in 5 min"'
 ```
-Port RCON **16211** (à restreindre à votre IP dans le pare-feu), mot de passe = `PZ_RCON_PASSWORD` du `.env`.
+RCON port **16211** (restrict to your IP in the firewall), password = `PZ_RCON_PASSWORD` from `.env`.
 
 ---
 
-## 🔑 Dépannage « mot de passe erroné »
+## 🔑 "Wrong password" troubleshooting
 
-Du plus fréquent au moins fréquent :
+From most to least common:
 
-1. **Cache du client (favoris)** — le launcher PZ mémorise le login par serveur favori.
-   → **Retire le serveur des favoris, puis rajoute-le** pour saisir le bon mot de passe.
+1. **Client cache (favorites)** — the PZ launcher remembers the login per favorite server.
+   → **Remove the server from favorites, then re-add it** to enter the correct password.
 
-2. **Compte perso oublié** — supprime-le, il se recrée au login (perso conservé, lié au pseudo) :
+2. **Forgotten character password** — delete the account, it's recreated on login (character kept, tied to the name):
    ```bash
    docker compose stop pz-server
    docker run --rm --volumes-from pz-server alpine sh -c \
-     "apk add --no-cache sqlite >/dev/null 2>&1 && sqlite3 /opt/pz-server/Zomboid/db/servertest.db \"DELETE FROM whitelist WHERE username='LePseudo';\""
+     "apk add --no-cache sqlite >/dev/null 2>&1 && sqlite3 /opt/pz-server/Zomboid/db/servertest.db \"DELETE FROM whitelist WHERE username='TheName';\""
    docker compose start pz-server
    ```
 
-3. **Mot de passe `admin` changé dans `.env`** — dans cet ordre :
+3. **`admin` password changed in `.env`** — in this order:
    ```bash
    nano .env                        # PZ_ADMIN_PASSWORD=...
-   docker compose up -d             # OBLIGATOIRE (restart ne recharge PAS .env)
+   docker compose up -d             # REQUIRED (restart does NOT reload .env)
    docker compose stop pz-server
    docker run --rm --volumes-from pz-server alpine sh -c \
      "apk add --no-cache sqlite >/dev/null 2>&1 && sqlite3 /opt/pz-server/Zomboid/db/servertest.db \"DELETE FROM whitelist WHERE username='admin';\""
-   docker compose start pz-server   # PZ recrée 'admin' avec le bon mot de passe
+   docker compose start pz-server   # PZ recreates 'admin' with the new password
    ```
 
-> ⚠️ **Règles d'or**
-> - Après un `.env` modifié → **`docker compose up -d`** (jamais `restart`/`start`).
-> - `-adminpassword` ne définit le mot de passe qu'à la **création** du compte → pour le changer, supprimer le compte de `whitelist` puis **redémarrer**.
-> - Supprimer un compte **serveur arrêté** (sinon PZ ne le recrée qu'au prochain boot).
-> - Compte ≠ personnage : supprimer le compte garde le perso (lié au pseudo dans la sauvegarde).
+> ⚠️ **Golden rules**
+> - After editing `.env` → **`docker compose up -d`** (never `restart`/`start`).
+> - `-adminpassword` only sets the password at account **creation** → to change it, delete the account from `whitelist` then **restart**.
+> - Delete an account **while the server is stopped** (otherwise PZ only recreates `admin` on the next boot).
+> - Account ≠ character: deleting the account keeps the character (tied to the name in the save).
 
 ---
 
-## 🚨 En cas de grief (serveur public)
-1. `/players` pour identifier
-2. `/banuser "pseudo" -ip -r "grief"`
-3. Restaurer un backup propre : `sudo ./scripts/backup-world.sh restore <nom>`
+## 🚨 In case of griefing (public server)
+1. `/players` to identify
+2. `/banuser "name" -ip -r "grief"`
+3. Restore a clean backup: `sudo ./scripts/backup-world.sh restore <name>`

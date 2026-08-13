@@ -2,12 +2,12 @@
 .docker/
 docker-compose.override.yml
 
-# Données du serveur
+# Server data
 Zomboid/
 pz_data/
 .pz-server-data/
 
-# Sauvegardes et backups
+# Backups
 backups/
 *.tar.gz
 *.zip.bak
@@ -17,13 +17,13 @@ backups/
 logs/
 server.log
 
-# Configuration locale & secrets (JAMAIS commités)
+# Local config & secrets (NEVER committed)
 config/ServerTestServer.local.ini
 .env
 .env.local
 .env.*.local
 
-# IDE et éditeurs
+# IDE & editors
 .vscode/
 .idea/
 *.swp
@@ -33,30 +33,16 @@ config/ServerTestServer.local.ini
 .project
 .classpath
 
-# Fichiers temporaires
+# Temp files
 *.tmp
 *.temp
 *.cache
 .cache/
 
-# Node et dépendances JS (si utilisé)
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Python (si utilisé)
-__pycache__/
-*.py[cod]
-*$py.class
-venv/
-env/
-
-# Fichiers OS
+# OS files
 Thumbs.db
-.DS_Store
-*.swp
 
-# Fichiers de build
+# Build files
 build/
 dist/
 *.o
@@ -64,8 +50,7 @@ dist/
 *.so
 
 # Git
-.git/
 .gitmodules
 
-# Fichiers de volume Docker locaux
+# Local Docker volumes
 volumes/

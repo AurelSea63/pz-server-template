@@ -6,7 +6,7 @@ services:
     container_name: pz-server
     hostname: pz-server
 
-    # Ressources — ajustez selon votre VPS (-Xmx doit rester < mem_limit)
+    # Resources — tune to your VPS (-Xmx must stay < mem_limit)
     mem_limit: 8g
     memswap_limit: 8g
     cpus: '4.0'
@@ -15,31 +15,31 @@ services:
     ports:
       - "16210:16210/tcp"
       - "16210:16210/udp"
-      # RCON / admin (restreignez la source dans votre pare-feu)
+      # RCON / admin (restrict the source in your firewall)
       - "16211:16211/tcp"
       - "16211:16211/udp"
-      # Ports Steam (référencement dans la liste Steam Internet)
+      # Steam ports (Steam Internet server list)
       - "8766:8766/udp"
       - "8767:8767/udp"
-      # Port direct secondaire PZ (supprime le warning de perfs)
+      # PZ secondary direct-connection port (removes the perf warning)
       - "16262:16262/udp"
 
     volumes:
-      # Données persistantes (monde, comptes)
+      # Persistent data (world, accounts)
       - pz_data:/opt/pz-server/Zomboid
-      # Configuration (ini + sandbox versionnés)
+      # Configuration (versioned ini + sandbox)
       - ./config:/opt/pz-server/config:ro
-      # Mods locaux éventuels (les mods Workshop se téléchargent seuls)
+      # Optional local mods (Workshop mods download themselves)
       - ./mods:/opt/pz-server/mods:ro
 
     environment:
-      # Identifiant serveur -> nom du fichier ini lu (Zomboid/Server/<id>.ini)
+      # Server id -> name of the ini file read (Zomboid/Server/<id>.ini)
       PZ_SERVER_NAME_ID: "servertest"
-      # Secrets injectés depuis .env (voir .env.example). Ne PAS mettre de secrets ici.
+      # Secrets injected from .env (see .env.example). Do NOT put secrets here.
       PZ_ADMIN_PASSWORD: "${PZ_ADMIN_PASSWORD:-changeme}"
       PZ_SERVER_PASSWORD: "${PZ_SERVER_PASSWORD:-}"
       PZ_RCON_PASSWORD: "${PZ_RCON_PASSWORD:-changeme}"
-      # -Xmx doit rester < mem_limit (marge JVM hors-heap)
+      # -Xmx must stay < mem_limit (headroom for off-heap JVM)
       JAVA_OPTS: "-Xmx6g -Xms2g -XX:+UseG1GC -XX:MaxGCPauseMillis=50"
       TZ: "Europe/Paris"
 
