@@ -1,0 +1,23 @@
+# Service systemd pour le watcher Discord temps réel.
+# Installation :
+#   1. Adaptez le chemin ci-dessous (WorkingDirectory / ExecStart) à votre repo.
+#   2. sudo cp systemd/pz-discord-watcher.service /etc/systemd/system/
+#   3. sudo systemctl daemon-reload
+#   4. sudo systemctl enable --now pz-discord-watcher
+#   Logs : journalctl -u pz-discord-watcher -f
+
+[Unit]
+Description=Project Zomboid - Discord watcher (notifications temps réel)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+WorkingDirectory=/path/to/repo
+ExecStart=/path/to/repo/scripts/discord-watcher.sh
+Restart=always
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target

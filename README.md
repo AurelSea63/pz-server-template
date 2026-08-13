@@ -98,8 +98,23 @@ Compte `admin` (mot de passe = `PZ_ADMIN_PASSWORD`), panneau admin in-game, kick
 
 ## 🔔 Discord (optionnel)
 
-Renseignez les webhooks dans `.env` (`DISCORD_WEBHOOK_URL`, `DISCORD_ANNOUNCE_WEBHOOK`, `DISCORD_EVENT_WEBHOOK`),
-puis appelez `scripts/discord-logger.sh` (start/stop/death/…). Laissé vide = désactivé.
+Renseignez les webhooks dans `.env` (`DISCORD_WEBHOOK_URL`, `DISCORD_ANNOUNCE_WEBHOOK`, `DISCORD_EVENT_WEBHOOK`).
+Laissé vide = désactivé.
+
+**Notifications temps réel** — le watcher lit les logs en continu et notifie automatiquement
+(connexions, déconnexions, morts, démarrage/arrêt) :
+```bash
+# Test manuel
+sudo ./scripts/discord-watcher.sh
+
+# En service (recommandé) — voir systemd/pz-discord-watcher.service
+sudo cp systemd/pz-discord-watcher.service /etc/systemd/system/
+sudo sed -i "s#/path/to/repo#$(pwd)#g" /etc/systemd/system/pz-discord-watcher.service
+sudo systemctl daemon-reload && sudo systemctl enable --now pz-discord-watcher
+journalctl -u pz-discord-watcher -f
+```
+> Les patterns de détection sont en haut de `discord-watcher.sh` — ajustez-les si un event ne se
+> déclenche pas (`docker logs pz-server` pour voir le format exact de votre version).
 
 ## 🔁 Workflow recommandé
 
