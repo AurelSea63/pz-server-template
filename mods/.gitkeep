@@ -1,0 +1,5 @@
+# Répertoire des mods Project Zomboid
+# Les fichiers ZIP des mods seront stockés ici
+
+# Utiliser le script manage-mods.sh pour ajouter les mods :
+# ./scripts/manage-mods.sh add /chemin/vers/mod.zip

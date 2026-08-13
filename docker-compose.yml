@@ -1,0 +1,66 @@
+services:
+  pz-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pz-server
+    hostname: pz-server
+
+    # Ressources — ajustez selon votre VPS (-Xmx doit rester < mem_limit)
+    mem_limit: 8g
+    memswap_limit: 8g
+    cpus: '4.0'
+
+    # Ports
+    ports:
+      - "16210:16210/tcp"
+      - "16210:16210/udp"
+      # RCON / admin (restreignez la source dans votre pare-feu)
+      - "16211:16211/tcp"
+      - "16211:16211/udp"
+      # Ports Steam (référencement dans la liste Steam Internet)
+      - "8766:8766/udp"
+      - "8767:8767/udp"
+      # Port direct secondaire PZ (supprime le warning de perfs)
+      - "16262:16262/udp"
+
+    volumes:
+      # Données persistantes (monde, comptes)
+      - pz_data:/opt/pz-server/Zomboid
+      # Configuration (ini + sandbox versionnés)
+      - ./config:/opt/pz-server/config:ro
+      # Mods locaux éventuels (les mods Workshop se téléchargent seuls)
+      - ./mods:/opt/pz-server/mods:ro
+
+    environment:
+      # Identifiant serveur -> nom du fichier ini lu (Zomboid/Server/<id>.ini)
+      PZ_SERVER_NAME_ID: "servertest"
+      # Secrets injectés depuis .env (voir .env.example). Ne PAS mettre de secrets ici.
+      PZ_ADMIN_PASSWORD: "${PZ_ADMIN_PASSWORD:-changeme}"
+      PZ_SERVER_PASSWORD: "${PZ_SERVER_PASSWORD:-}"
+      PZ_RCON_PASSWORD: "${PZ_RCON_PASSWORD:-changeme}"
+      # -Xmx doit rester < mem_limit (marge JVM hors-heap)
+      JAVA_OPTS: "-Xmx6g -Xms2g -XX:+UseG1GC -XX:MaxGCPauseMillis=50"
+      TZ: "Europe/Paris"
+
+    restart: unless-stopped
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
+
+    networks:
+      - pz-network
+
+volumes:
+  pz_data:
+    driver: local
+
+networks:
+  pz-network:
+    driver: bridge

@@ -1,0 +1,71 @@
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Données du serveur
+Zomboid/
+pz_data/
+.pz-server-data/
+
+# Sauvegardes et backups
+backups/
+*.tar.gz
+*.zip.bak
+
+# Logs
+*.log
+logs/
+server.log
+
+# Configuration locale & secrets (JAMAIS commités)
+config/ServerTestServer.local.ini
+.env
+.env.local
+.env.*.local
+
+# IDE et éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# Node et dépendances JS (si utilisé)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python (si utilisé)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# Fichiers OS
+Thumbs.db
+.DS_Store
+*.swp
+
+# Fichiers de build
+build/
+dist/
+*.o
+*.a
+*.so
+
+# Git
+.git/
+.gitmodules
+
+# Fichiers de volume Docker locaux
+volumes/
