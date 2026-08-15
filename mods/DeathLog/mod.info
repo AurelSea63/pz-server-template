@@ -1,0 +1,4 @@
+name=Death Log
+id=DeathLog
+description=Logs player deaths (zombie kills + hours survived) to the server console, for live Discord notifications.
+pzversion=42

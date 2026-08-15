@@ -1,7 +1,7 @@
 #!/bin/bash
-# Real-time watcher: sends live Discord notifications.
-#  - Connections / disconnections / startup: read from the container output (docker logs).
-#  - Deaths: read from Zomboid/Logs/*_PerkLog.txt ([Died][Hours Survived: N] lines).
+# Real-time watcher: reads the PZ container output and sends live Discord notifications.
+#  - Connections / disconnections / startup: standard PZ log lines.
+#  - Deaths: "[DEATHLOG] kills=.. hours=.. user=.." line emitted by the bundled DeathLog mod.
 # Restarts itself if the container restarts. Best run via systemd (see README).
 #
 # Usage: sudo ./scripts/discord-watcher.sh
@@ -24,7 +24,7 @@ extract_user() {
     printf '%s' "${u:-a player}"
 }
 
-# Hours (integer) -> "X days and Y hours" (the server log has no minutes).
+# Hours (integer) -> "X days and Y hours" (the game only provides hours).
 fmt_survival() {
     local h="$1" d rem out=""
     d=$((h / 24)); rem=$((h % 24))
@@ -36,41 +36,16 @@ fmt_survival() {
 
 notify() { "${LOGGER}" "$@" >/dev/null 2>&1 || true; }
 
-# Host path of the Logs folder (via the Zomboid volume mount — portable).
-logs_dir() {
-    local src
-    src=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/opt/pz-server/Zomboid"}}{{.Source}}{{end}}{{end}}' "${CONTAINER}" 2>/dev/null)
-    [ -n "$src" ] && printf '%s/Logs' "$src"
-}
-
-# Background task: follow the current PerkLog and notify deaths (with survival time).
-watch_deaths() {
-    local dir f name hours
-    while true; do
-        dir=$(logs_dir); [ -z "$dir" ] && { sleep 15; continue; }
-        f=$(ls -t "${dir}"/*_PerkLog.txt 2>/dev/null | head -1)
-        [ -z "$f" ] && { sleep 15; continue; }
-        # timeout: periodically re-scan for the newest PerkLog (new file after a restart)
-        timeout 600 tail -n0 -F "$f" 2>/dev/null | while IFS= read -r line; do
-            case "$line" in
-                *"][Died][Hours Survived:"*)
-                    name=$(printf '%s' "$line" | sed -nE 's/.*\[[0-9]{17}\]\[([^]]+)\].*\[Died\].*/\1/p')
-                    hours=$(printf '%s' "$line" | sed -nE 's/.*Hours Survived: ([0-9]+).*/\1/p')
-                    notify death "${name:-a player}" "$(fmt_survival "${hours:-0}")"
-                    ;;
-            esac
-        done
-    done
-}
-
 echo "[watcher] starting — container=${CONTAINER}"
-watch_deaths &                      # deaths (via Logs/*_PerkLog.txt)
-trap 'kill 0' EXIT                  # stop the background task on exit
-
 while true; do
     # --since=1s: on (re)start we don't replay history (avoids duplicates)
     docker logs -f --since=1s "${CONTAINER}" 2>&1 | while IFS= read -r line; do
-        if   echo "$line" | grep -qiE "${RE_CONNECT}";    then notify connect    "$(extract_user "$line")"
+        if echo "$line" | grep -q "\[DEATHLOG\]"; then
+            kills=$(printf '%s' "$line" | sed -nE 's/.*kills=([0-9]+).*/\1/p')
+            hours=$(printf '%s' "$line" | sed -nE 's/.*hours=([0-9]+).*/\1/p')
+            name=$(printf '%s' "$line"  | sed -nE 's/.*user=(.*)$/\1/p' | sed 's/[[:space:]]*$//')
+            notify death "${name:-a player}" "$(fmt_survival "${hours:-0}") — ${kills:-0} zombies killed"
+        elif echo "$line" | grep -qiE "${RE_CONNECT}";    then notify connect    "$(extract_user "$line")"
         elif echo "$line" | grep -qiE "${RE_DISCONNECT}"; then notify disconnect "$(extract_user "$line")"
         elif echo "$line" | grep -qiE "${RE_READY}";      then notify start
         fi

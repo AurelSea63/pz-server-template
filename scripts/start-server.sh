@@ -64,6 +64,13 @@ if [ -f "${SANDBOX_SRC}" ]; then
     log_success "SandboxVars applied from config/ (git-versioned)"
 fi
 
+# LOCAL mods (repo mods/ folder) copied into the cachedir so PZ loads them
+if [ -d "${PZ_HOME}/mods" ]; then
+    mkdir -p "${PZ_DATA_DIR}/mods"
+    cp -rf "${PZ_HOME}/mods/." "${PZ_DATA_DIR}/mods/" 2>/dev/null || true
+    log_success "Local mods copied to cachedir"
+fi
+
 # Apply the Java heap from JAVA_OPTS (-Xmx...) to the PZ launcher (ProjectZomboid64.json)
 PZ_JSON="${PZ_GAME_DIR}/ProjectZomboid64.json"
 XMX=$(echo "${JAVA_OPTS}" | grep -oE '\-Xmx[0-9]+[gGmM]' | head -1)
