@@ -1,12 +1,14 @@
--- DeathLog: prints player death info to the server console (read by the Discord watcher).
--- Username is put LAST so names containing spaces are parsed correctly.
-local function onPlayerDeath(player)
-    if player == nil then return end
-    local name = player:getUsername()
+-- DeathLog: prints player death info to the server console (read by a log watcher).
+print("[DEATHLOG] mod loaded (server)")
+
+local function onDeath(character)
+    if character == nil then return end
+    if not instanceof(character, "IsoPlayer") then return end  -- players only (ignore zombies)
+    local name = character:getUsername()
     if name == nil then name = "unknown" end
-    local kills = player:getZombieKills()
-    local hours = math.floor(player:getHoursSurvived())
+    local kills = character:getZombieKills()
+    local hours = math.floor(character:getHoursSurvived())
     print("[DEATHLOG] kills=" .. tostring(kills) .. " hours=" .. tostring(hours) .. " user=" .. name)
 end
 
-Events.OnPlayerDeath.Add(onPlayerDeath)
+Events.OnCharacterDeath.Add(onDeath)
