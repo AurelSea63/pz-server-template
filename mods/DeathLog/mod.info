@@ -1,5 +1,0 @@
-name=Death Log
-id=DeathLog
-description=Prints player deaths (zombie kills + hours survived) to the server console, for live Discord notifications. Server-side only.
-modversion=1.0.0
-pzversion=42.20.0
