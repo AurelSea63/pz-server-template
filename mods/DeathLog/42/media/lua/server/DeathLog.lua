@@ -1,6 +1,5 @@
--- DeathLog: prints player death info to the server console (read by a log watcher).
-print("[DEATHLOG] mod loaded (server)")
-
+-- DeathLog: prints each player death to the server console (read by a log watcher).
+-- Output: [DEATHLOG] kills=<n> hours=<n> user=<name>
 local function onDeath(character)
     if character == nil then return end
     if not instanceof(character, "IsoPlayer") then return end  -- players only (ignore zombies)
